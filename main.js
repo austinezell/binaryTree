@@ -1,78 +1,89 @@
 "use strict";
-const fs = require('fs')
 const util = require('util')
 
-
-
 let nums = [];
-for (let i = 0; i<50; i++){
-  let randomNum = Math.floor(Math.random()*50);
-  if(nums.indexOf(randomNum) < 0) {
-    nums.push(randomNum)
-  }
-}
-nums.sort((a,b)=>a-b)
 
-function* midPointGenerator(values){
-  let k = 1;
-  let midPoint = 1;
-  while(midPoint > 0){
-    midPoint = Math.floor(values.length/Math.pow(2,k++));
-    yield midPoint;
+for (let i = 0; i<50; i++){
+  let randomNum = Math.floor(Math.random()*100);
+  if(nums.indexOf(randomNum) < 0) {
+    nums.push(randomNum);
   }
 }
 
 class Branch {
-  constructor(value, left, right){
+  constructor(value){
     this.value = value;
-    this.left = left || null;
-    this.right = right || null;
+    this.left = null;
+    this.right = null;
+  }
+  nextDirection(value){
+    return value > this.value ? "right" : "left"
   }
 }
 
-
-class Tree {
+class BinaryTree {
   constructor(values){
+    values = Array.from(values);
     values.sort((a,b)=>a-b);
-    this.array = values;
     let rootValue = values[Math.floor(values.length/2)];
+    // creates top node
     this._root = new Branch(rootValue);
-    this.generateMidpoints("right");
-    this.generateMidpoints("left");
+    //generates halfway points for all other values to fall in between
+    this.generateMidPoints("right", values);
+    this.generateMidPoints("left", values);
+    // adds remaining values
     for (let value of values){
-      let currentBranch = this._root;
-      if (!this.contains(value)){
-        let i = 0;
-        while (currentBranch.value !== value){
-          let direction = value < currentBranch.value
-            ? "left"
-              : "right";
-          if (currentBranch[direction] === null){
-            currentBranch[direction] = new Branch(value)
-          }
-          currentBranch = currentBranch[direction]
-        }
-      }
+      this.addValue(value);
     }
-    console.log(util.inspect(this._root, {showHidden: false, depth: null}));
   }
 
-  generateMidpoints(direction){
-    let midPoint = midPointGenerator(this.array);
-    let index = midPoint.next().value;
+  addValue(value){
+    if (!this.contains(value)){
+      let currentBranch = this._root;
+      while (currentBranch.value !== value){
+        let direction = currentBranch.nextDirection(value);
+        if (currentBranch[direction] === null){
+          //generates new branch in direction
+          currentBranch[direction] = new Branch(value);
+        }
+        currentBranch = currentBranch[direction];
+      }
+    }
+    // console.log(util.inspect(this._root, {showHidden: false, depth: null}));
+  }
+
+  toArray(){
+    function getValue(branch){
+      let values = [];
+      values.push(branch.value);
+      if (branch.left && branch.right) {
+        return values.concat(getValue(branch.left)).concat(getValue(branch.right));
+      }
+      if (branch.right) return values.concat(getValue(branch.right));
+      if (branch.left) return values.concat(getValue(branch.left));
+      return values;
+    }
+    return getValue(this._root).sort((a,b)=>a-b);
+  }
+
+  sum(){
+    return this.toArray().reduce((a,b)=>a+b);
+  }
+
+  generateMidPoints(direction, values){
+    let k =1;
+    let midPoint = Math.floor(values.length/Math.pow(2,k++));
     let currentBranch = this._root;
-    while(index){
-      index = midPoint.next().value;
+    while(midPoint){
+      midPoint = Math.floor(values.length/Math.pow(2,k++));
       if(direction==="left"){
-        currentBranch[direction] = new Branch(this.array[index]);
-      } else currentBranch[direction] = new Branch(this.array[this.array.length - index -1])
+        currentBranch[direction] = new Branch(values[midPoint]);
+      } else currentBranch[direction] = new Branch(values[values.length - midPoint -1]);
       currentBranch = currentBranch[direction];
     }
   }
 
-
   contains(value){
-    let isContains = false;
     let currentBranch = this._root;
     while (currentBranch){
       if(currentBranch.value === value) return true;
@@ -82,22 +93,4 @@ class Tree {
   }
 }
 
-let tree = new Tree(nums)
-
-console.log(tree);
-
-
-// let i = 1;
-// let count =(branch)=>{
-//   i++
-//   if(branch.left.value) {
-//     count(branch.left)
-//   }
-//   if(branch.right.value){
-//     count(branch.right)
-//   }
-// }
-// count(tree);
-// fs.writeFile('tree.json', JSON.stringify(tree), function(err){
-//   console.log("hit");
-// })
+let tree = new BinaryTree(nums)
