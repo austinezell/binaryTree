@@ -28,13 +28,16 @@ class Branch {
 
 class BinaryTree {
   constructor(value){
-    if (Array.isArray(value) || arguments.length > 1){
-      let values = Array.isArray(value) ? value : Array.from(arguments);
-      this.constructFromDataSet(values)
+    if (Array.isArray(value)){
+      return this.constructFromDataSet(value)
     }
-    else if (value){
-      this._root = new Branch(value);
-    } else this._root = null;
+    if(arguments.length>1){
+      return this.constructFromDataSet(Array.from(arguments))
+    }
+    if (value){
+      return this._root = new Branch(value);
+    }
+    return this._root = null;
   }
   constructFromDataSet(values){
     let rootValue = values[Math.floor(values.length/2)];
@@ -111,16 +114,3 @@ class BinaryTree {
     return currentBranch._value
   }
 }
-
-let tree1 = new BinaryTree()
-let nums =  [];
-let pushNums = false;
-for (let i = 0; i<400; i++){
-  let randomNum = Math.floor(Math.random()*400) - 200;
-  pushNums ? nums.push(randomNum) : tree1.addValue(randomNum)
-  pushNums = !pushNums
-}
-let tree2 = new BinaryTree(nums)
-
-// console.log(util.inspect(tree1, {showHidden: false, depth: null}));
-// console.log(util.inspect(tree2, {showHidden: false, depth: null}));
