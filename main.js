@@ -20,12 +20,6 @@ class Branch {
   setRight(node){
     return this._right = node;
   }
-  getLeft(){
-    return this._left;
-  }
-  getRight(){
-    return this._right
-  }
   setChild(node, direction){
     this[direction] = node;
   }
@@ -33,11 +27,12 @@ class Branch {
     return this._parent;
   }
   traverseNext(value){
-    return value < this._value ? {
-      node: this.getLeft(),
+    return value < this._value ?
+    {
+      node: this._left,
       direction: "_left"
     } : {
-      node: this.getRight(),
+      node: this._right,
       direction: "_right"
     }
   }
@@ -113,6 +108,21 @@ class BinaryTree {
     }
     return false
   }
+  minimum(){
+    let currentBranch = this._root;
+    while(currentBranch._left){
+      currentBranch = currentBranch._left;
+    }
+    console.log(currentBranch);
+    return currentBranch._value
+  }
+  maximum(){
+    let currentBranch = this._root;
+    while(currentBranch._right){
+      currentBranch = currentBranch._right;
+    }
+    return currentBranch._value
+  }
 }
 
 let tree1 = new BinaryTree()
@@ -126,4 +136,4 @@ for (let i = 0; i<400; i++){
 let tree2 = new BinaryTree(nums)
 
 // console.log(util.inspect(tree1, {showHidden: false, depth: null}));
-console.log(util.inspect(tree2, {showHidden: false, depth: null}));
+// console.log(util.inspect(tree2, {showHidden: false, depth: null}));
