@@ -1,24 +1,12 @@
 "use strict";
 const util = require('util')
 
-
-
-
 class Branch {
   constructor(value, parent, left, right){
     this._value = value;
-    this._parent = parent || null;
-    if (parent === false){
-      Object.freeze(this._parent);
-    }
+    this._parent = parent;
     this._left = left || null;
     this._right = right || null;
-  }
-  setLeft(node){
-    return this._left = node;
-  }
-  setRight(node){
-    return this._right = node;
   }
   setChild(node, direction){
     this[direction] = node;
@@ -45,12 +33,12 @@ class BinaryTree {
       this.constructFromDataSet(values)
     }
     else if (value){
-      this._root = new Branch(value, false);
+      this._root = new Branch(value);
     } else this._root = null;
   }
   constructFromDataSet(values){
     let rootValue = values[Math.floor(values.length/2)];
-    this._root = new Branch(rootValue, false);
+    this._root = new Branch(rootValue);
     this.generateMidPoints("_right", values);
     this.generateMidPoints("_left", values);
     for(let value of values){
@@ -73,7 +61,7 @@ class BinaryTree {
 
   addValue(value){
     if (this.contains(value)) return;
-    if (this._root === null) return this._root = new Branch(value, false)
+    if (this._root === null) return this._root = new Branch(value)
     let currentBranch = this._root;
     while (currentBranch._value !== value){
       let next = currentBranch.traverseNext(value);
@@ -113,7 +101,6 @@ class BinaryTree {
     while(currentBranch._left){
       currentBranch = currentBranch._left;
     }
-    console.log(currentBranch);
     return currentBranch._value
   }
   maximum(){
